@@ -18,9 +18,14 @@ import (
 
 var listFlag bool
 var rootCmd = &cobra.Command{
-	Use:   "gosun 城市名",
+	Use:   "gosun 省份/城市名",
 	Short: "gosun 是一款用于查询中国城市天气的终端工具",
 	Long:  `gosun 是一款用于查询中国城市天气的终端工具`,
+	Example: `示例 1：
+gosun 深圳
+	
+示例 2：
+gosun 上海 -l`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			fmt.Println("请输入城市名")

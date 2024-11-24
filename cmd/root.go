@@ -16,6 +16,7 @@ import (
 	"github.com/fatih/color"
 )
 
+var listFlag bool
 var rootCmd = &cobra.Command{
 	Use:   "gosun 城市名",
 	Short: "gosun 是一款用于查询中国城市天气的终端工具",
@@ -29,6 +30,19 @@ var rootCmd = &cobra.Command{
 		webURL := getWebURL(args[0])
 		if webURL == "" {
 			fmt.Println("查询的城市名称有误！")
+			return
+		}
+
+		if listFlag {
+			cts := getCityList(args[0])
+			if len(cts) == 0 {
+				fmt.Println("请输入正确的省份名/直辖市名")
+				return
+			}
+			fmt.Printf("以下是%s的所有城市/地区名：\n", args[0])
+			for _, c := range cts {
+				fmt.Println(c)
+			}
 			return
 		}
 
@@ -54,6 +68,8 @@ var provinces []province
 
 func init() {
 	_ = json.Unmarshal(data, &provinces)
+
+	rootCmd.Flags().BoolVarP(&listFlag, "list", "l", false, "List all cities")
 }
 
 func getWebURL(city string) string {
@@ -174,4 +190,18 @@ func showWeatherData(wd *weatherData) {
 				info.nightWtr.weather, info.nightWtr.minTemp, info.nightWtr.wind, info.nightWtr.windDir)
 		}
 	}
+}
+
+func getCityList(province string) []string {
+	cities := make([]string, 0)
+	for _, prv := range provinces {
+		if strings.Contains(prv.Name, province) {
+			for _, ct := range prv.Cities {
+				cities = append(cities, ct.Name)
+			}
+			break
+		}
+	}
+
+	return cities
 }
